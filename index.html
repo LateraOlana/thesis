@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Remaining Days — Latera's PhD Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400;1,500&family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1612;
+    --paper: #f4ede0;
+    --paper-warm: #ede3cf;
+    --cream: #faf5e9;
+    --accent-red: #c53030;
+    --accent-ochre: #c67b18;
+    --accent-moss: #5d6e3a;
+    --accent-plum: #6b2c4e;
+    --accent-ocean: #2a5266;
+    --accent-rose: #c56a7a;
+    --accent-sand: #a68c5c;
+    --accent-slate: #3a3f5a;
+    --accent-mustard: #b5893a;
+    --accent-terracotta: #b3593e;
+    --faded: #5c544a;
+    --hairline: rgba(26, 22, 18, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Fraunces', Georgia, serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(180, 140, 80, 0.06) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(120, 80, 40, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(0,0,0,0.015) 0%, transparent 70%);
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+  }
+
+  /* Floating config button (fixed, above header) */
+  .config-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 50;
+    background: var(--cream);
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    padding: 6px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    letter-spacing: 0.12em;
+    border-radius: 2px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .config-btn:hover {
+    background: var(--ink);
+    color: var(--cream);
+    transform: translateY(-1px);
+  }
+
+  header {
+    position: relative;
+    z-index: 2;
+    padding: 2rem 2.5rem 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .masthead {
+    font-family: 'Fraunces', serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  .masthead span { color: var(--accent-red); }
+
+  .issue {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--faded);
+    letter-spacing: 0.1em;
+    margin-right: 6rem;
+  }
+
+  .hero {
+    position: relative;
+    z-index: 2;
+    padding: 4rem 2.5rem 3rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero-kicker {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(1.3rem, 2vw, 1.8rem);
+    color: var(--accent-red);
+    transform: rotate(-2deg);
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.1s forwards;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3rem, 9vw, 8rem);
+    font-weight: 300;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  h1 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent-red);
+  }
+
+  .hero-sub {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+    color: var(--faded);
+    margin-top: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+
+  .countdown-strip {
+    position: relative;
+    z-index: 2;
+    margin: 2rem auto 0.5rem;
+    max-width: 900px;
+    padding: 1.5rem 2rem;
+    background: var(--cream);
+    border: 1px solid var(--hairline);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.7s forwards;
+  }
+
+  .count-block { text-align: center; }
+  .count-block .num {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1;
+    display: block;
+  }
+  .count-block .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-top: 0.5rem;
+  }
+  .count-block.primary .num {
+    color: var(--accent-red);
+    font-weight: 500;
+  }
+  .count-sep { width: 1px; height: 50px; background: var(--hairline); }
+
+  .countdown-caption {
+    text-align: center;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--faded);
+    margin: 0 auto 1rem;
+    max-width: 900px;
+    padding: 0 1rem;
+  }
+
+  /* Editor's note (pinned) */
+  .editor-note {
+    position: relative;
+    z-index: 2;
+    max-width: 680px;
+    margin: 3rem auto 0;
+    padding: 2rem 2rem;
+    background: var(--paper-warm);
+    border: 1px solid var(--hairline);
+    transform: rotate(-0.4deg);
+  }
+  .editor-note .pin {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: var(--accent-red);
+    border-radius: 50%;
+    border: 3px solid var(--paper);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .editor-note .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-bottom: 0.8rem;
+  }
+  .editor-note p {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.15rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .editor-note .signed {
+    font-family: 'Caveat', cursive;
+    font-size: 1.6rem;
+    color: var(--accent-red);
+    margin-top: 0.8rem;
+    text-align: right;
+    transform: rotate(-3deg);
+    display: inline-block;
+    float: right;
+  }
+
+  /* Modal */
+  .config-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 22, 18, 0.5);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .config-modal.active { display: flex; }
+  .config-modal .inner {
+    background: var(--cream);
+    padding: 2rem;
+    max-width: 420px;
+    width: 100%;
+    border: 1px solid var(--ink);
+  }
+  .config-modal h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.4rem;
+    margin-bottom: 0.25rem;
+  }
+  .config-modal .modal-sub {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--faded);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  .config-modal label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-bottom: 0.4rem;
+    margin-top: 1rem;
+    font-family: 'Space Mono', monospace;
+  }
+  .config-modal input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+  .config-modal .buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  .config-modal button {
+    flex: 1;
+    padding: 0.7rem;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .config-modal button:hover { background: var(--ink); color: var(--cream); }
+  .config-modal button.primary { background: var(--ink); color: var(--cream); }
+  .config-modal button.primary:hover { background: var(--accent-red); border-color: var(--accent-red); }
+
+  .divider {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 3rem 0 1rem;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--faded);
+  }
+  .divider::before, .divider::after {
+    content: '';
+    display: inline-block;
+    width: 40px;
+    height: 1px;
+    background: var(--faded);
+    vertical-align: middle;
+    margin: 0 1.5rem;
+    opacity: 0.4;
+  }
+
+  .rules {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 2rem 5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .rule-card {
+    position: relative;
+    padding: 2rem 1.75rem 1.75rem;
+    background: var(--cream);
+    border: 1px solid var(--hairline);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 280px;
+  }
+
+  .rule-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  .rule-card:hover {
+    transform: translateY(-4px) rotate(-0.5deg);
+    box-shadow: 8px 12px 0 rgba(26, 22, 18, 0.08);
+  }
+  .rule-card:nth-child(2n):hover { transform: translateY(-4px) rotate(0.5deg); }
+  .rule-card:nth-child(3n):hover { transform: translateY(-6px) rotate(-0.3deg); }
+
+  .rule-num {
+    font-family: 'Fraunces', serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .rule-num .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .rule-card h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    flex: 1;
+  }
+  .rule-card h2 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .rule-note {
+    font-family: 'Caveat', cursive;
+    font-size: 1.15rem;
+    color: var(--faded);
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--hairline);
+    line-height: 1.3;
+  }
+
+  .rule-card .stamp {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--faded);
+    letter-spacing: 0.15em;
+    opacity: 0.6;
+  }
+
+  .rule-card:nth-child(1) { --accent: var(--accent-red); }
+  .rule-card:nth-child(2) { --accent: var(--accent-ochre); }
+  .rule-card:nth-child(3) { --accent: var(--accent-moss); }
+  .rule-card:nth-child(4) { --accent: var(--accent-mustard); }
+  .rule-card:nth-child(5) { --accent: var(--accent-ocean); }
+  .rule-card:nth-child(6) { --accent: var(--accent-slate); }
+  .rule-card:nth-child(7) { --accent: var(--accent-plum); }
+  .rule-card:nth-child(8) { --accent: var(--accent-terracotta); }
+  .rule-card:nth-child(9) { --accent: var(--accent-rose); }
+  .rule-card:nth-child(10) { --accent: var(--accent-sand); }
+
+  .rule-card { opacity: 0; transform: translateY(20px); }
+  .rule-card.in-view {
+    animation: cardIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .today-focus {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 2rem auto 4rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    background:
+      linear-gradient(135deg, transparent 49.5%, var(--hairline) 49.5%, var(--hairline) 50.5%, transparent 50.5%),
+      var(--paper-warm);
+    background-size: 12px 12px, 100% 100%;
+    border: 1px solid var(--hairline);
+  }
+  .today-focus .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-bottom: 1rem;
+  }
+  .today-focus .quote {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .today-focus .quote::before {
+    content: '"';
+    font-size: 3em;
+    font-family: 'Fraunces', serif;
+    display: block;
+    line-height: 0.5;
+    margin-bottom: 1rem;
+    color: var(--accent-red);
+    font-weight: 400;
+  }
+  .today-focus .attribution {
+    margin-top: 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  footer {
+    position: relative;
+    z-index: 2;
+    padding: 3rem 2.5rem 2rem;
+    border-top: 1px solid var(--hairline);
+    text-align: center;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--faded);
+    font-size: 0.95rem;
+  }
+  footer .sig {
+    font-family: 'Caveat', cursive;
+    font-style: normal;
+    font-size: 1.5rem;
+    color: var(--accent-red);
+    margin-top: 0.5rem;
+    display: inline-block;
+    transform: rotate(-2deg);
+  }
+  footer .fine {
+    font-family: 'Space Mono', monospace;
+    font-style: normal;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-top: 1rem;
+    opacity: 0.6;
+  }
+
+  .flourish {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.15;
+  }
+  .flourish-1 {
+    top: 2rem;
+    left: -2rem;
+    width: 180px;
+    transform: rotate(-15deg);
+  }
+
+  @media (max-width: 720px) {
+    header {
+      padding: 1.2rem 1.2rem 0.8rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .issue { margin-right: 0; }
+    .hero { padding: 2.5rem 1.2rem 2rem; }
+    .rules { padding: 1.5rem 1.2rem 3rem; gap: 1rem; }
+    .today-focus { margin: 1.5rem 1.2rem 3rem; padding: 2rem 1.2rem; }
+    .editor-note { margin: 2.5rem 1.2rem 0; }
+    .count-sep { display: none; }
+    .countdown-strip {
+      padding: 1.2rem;
+      gap: 1rem;
+      margin: 1.5rem 1.2rem 0.5rem;
+    }
+    footer { padding: 2rem 1.2rem 1.5rem; }
+    .config-btn { top: 0.75rem; right: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<button class="config-btn" id="configBtn">Set dates</button>
+
+<header>
+  <div class="masthead">The Dissertation Journal &middot; <span>Latera, editor-in-chief</span></div>
+  <div class="issue">TODAY &middot; <span id="today-fmt"></span></div>
+</header>
+
+<section class="hero">
+  <svg class="flourish flourish-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20,100 Q50,20 100,100 T180,100" fill="none" stroke="#1a1612" stroke-width="2"/>
+    <circle cx="100" cy="100" r="3" fill="#1a1612"/>
+    <circle cx="50" cy="60" r="2" fill="#1a1612"/>
+    <circle cx="150" cy="140" r="2" fill="#1a1612"/>
+  </svg>
+
+  <span class="hero-kicker">a small, serious, silly manifesto</span>
+  <h1>The remaining<br>days of <em>PhD</em></h1>
+  <p class="hero-sub">Life is already complicated and hard! so here are 10 rules, in the most stupid and simple way! </p>
+</section>
+
+<section class="countdown-strip">
+  <div class="count-block primary">
+    <span class="num" id="days-left">&mdash;</span>
+    <div class="label">days remaining</div>
+  </div>
+  <div class="count-sep"></div>
+  <div class="count-block">
+    <span class="num" id="weeks-left">&mdash;</span>
+    <div class="label">weeks</div>
+  </div>
+  <div class="count-sep"></div>
+  <div class="count-block">
+    <span class="num" id="months-left">&mdash;</span>
+    <div class="label">months</div>
+  </div>
+  <div class="count-sep"></div>
+  <div class="count-block">
+    <span class="num" id="progress-pct">&mdash;</span>
+    <div class="label">% complete</div>
+  </div>
+</section>
+<p class="countdown-caption">not a deadline.</p>
+
+<section class="editor-note">
+  <div class="pin" aria-hidden="true"></div>
+  <div class="label"></div>
+  <p>
+    This is a journal of ten very small promises I'm trying to keep. They are mostly for me. You may borrow them. Refresh the page when the day feels long. Ignore the counter if it's being dramatic.
+  </p>
+  <span class="signed">&mdash; Latera</span>
+  <div style="clear:both"></div>
+</section>
+
+<div class="divider">some guiding rules (just few): </div>
+
+<section class="rules" id="rules">
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 01</div>
+    <div class="stamp">KINDNESS</div>
+    <h2>Be <em>kind</em>, even in the most cynical situations.</h2>
+    <div class="rule-note">Especially to the Reviewer 2 living in your head.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 02</div>
+    <div class="stamp">BOUNDARIES</div>
+    <h2>Learn to say <em>no</em>, within the bounds of your kindness.</h2>
+    <div class="rule-note">"No, thank you" is two whole words. Very usable.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 03</div>
+    <div class="stamp">LEAN IN</div>
+    <h2>Ask for <em>help</em>. It does not have to be only your fight.</h2>
+    <div class="rule-note">Advisors exist. Friends exist. That person three years ahead of you also exists.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 04</div>
+    <div class="stamp">NOURISH</div>
+    <h2>Three meals. Breakfast, lunch, <em>early dinner</em>. One meat-free.</h2>
+    <div class="rule-note">You cannot out-brain hunger. Just go eat.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 05</div>
+    <div class="stamp">PRESENCE</div>
+    <h2>Listen with <em>empathy</em>. Don't talk about yourself unless it helps.</h2>
+    <div class="rule-note">Nobody came for your anecdote. Yet.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 06</div>
+    <div class="stamp">HUMILITY</div>
+    <h2>The world is full of smarter people. <em>Look up</em> &mdash; while admiring how far you've come.</h2>
+    <div class="rule-note">Awe and self-respect are not opposites.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 07</div>
+    <div class="stamp">PEOPLE</div>
+    <h2>Connect with loved ones. Reach out to the friends you've <em>lost touch</em> with.</h2>
+    <div class="rule-note">Mom texted. Tuesday. Just saying.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 08</div>
+    <div class="stamp">MOVE</div>
+    <h2>Run if you can. <em>Walk</em> 35 minutes every other day. Persist.</h2>
+    <div class="rule-note">The chair has held you long enough today.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 09</div>
+    <div class="stamp">FINISH</div>
+    <h2>Finish the books you already <em>own</em> before buying new ones.</h2>
+    <div class="rule-note">The TBR pile isn't angry. Just disappointed.</div>
+  </article>
+
+  <article class="rule-card">
+    <div class="rule-num"><span class="dot"></span> N&ordm; 10</div>
+    <div class="stamp">MAKE</div>
+    <h2>Finish the parallel papers. Learn a <em>language</em>. Take up drawing.</h2>
+    <div class="rule-note">A hobby is how you remember you are not just a PhD.</div>
+  </article>
+</section>
+
+<section class="today-focus">
+  <div class="eyebrow">Today's focus &middot; chosen by the universe!</div>
+  <div class="quote" id="today-quote">Choose one rule and let it shape the day.</div>
+  <div class="attribution" id="today-label">&mdash; rotating daily</div>
+</section>
+
+<footer>
+  Built slowly, kept honestly. May the remaining days be full of the good kind of tired.
+  <br>
+  <span class="sig">&mdash; Latera</span>
+  <div class="fine">a tiny anchor for a long passage &middot; v.1</div>
+</footer>
+
+<div class="config-modal" id="configModal">
+  <div class="inner">
+    <h3>Set your PhD timeline</h3>
+    <div class="modal-sub">the numbers above will update. no pressure.</div>
+    <label for="startDate">Start date</label>
+    <input type="date" id="startDate">
+    <label for="endDate">Expected defense / end date</label>
+    <input type="date" id="endDate">
+    <div class="buttons">
+      <button id="cancelBtn">Cancel</button>
+      <button class="primary" id="saveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DEFAULT DATES — Latera, edit these or use the button above
+// ============================================================
+const DEFAULTS = {
+  start: '2022-09-01',
+  end: '2026-08-31'
+};
+
+function getConfig() {
+  try {
+    const stored = localStorage.getItem('phd-config');
+    if (stored) return JSON.parse(stored);
+  } catch (e) { /* ignore */ }
+  return DEFAULTS;
+}
+
+function saveConfigToStorage(cfg) {
+  try { localStorage.setItem('phd-config', JSON.stringify(cfg)); }
+  catch (e) { /* ignore */ }
+}
+
+function daysBetween(a, b) {
+  const MS = 1000 * 60 * 60 * 24;
+  return Math.round((b - a) / MS);
+}
+
+function updateCountdown() {
+  const cfg = getConfig();
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const start = new Date(cfg.start);
+  const end = new Date(cfg.end);
+
+  const total = daysBetween(start, end);
+  const elapsed = Math.max(0, daysBetween(start, now));
+  const remaining = Math.max(0, daysBetween(now, end));
+  const pct = total > 0 ? Math.min(100, Math.max(0, Math.round((elapsed / total) * 100))) : 0;
+
+  document.getElementById('days-left').textContent = remaining.toLocaleString();
+  document.getElementById('weeks-left').textContent = Math.ceil(remaining / 7).toLocaleString();
+  document.getElementById('months-left').textContent = Math.ceil(remaining / 30.44).toLocaleString();
+  document.getElementById('progress-pct').textContent = pct + '%';
+
+  const fmt = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  document.getElementById('today-fmt').textContent = fmt.toUpperCase();
+}
+
+// Modal via addEventListener (not inline onclick)
+const configBtn = document.getElementById('configBtn');
+const configModal = document.getElementById('configModal');
+const cancelBtn = document.getElementById('cancelBtn');
+const saveBtn = document.getElementById('saveBtn');
+const startInput = document.getElementById('startDate');
+const endInput = document.getElementById('endDate');
+
+function openConfig() {
+  const cfg = getConfig();
+  startInput.value = cfg.start;
+  endInput.value = cfg.end;
+  configModal.classList.add('active');
+}
+function closeConfig() {
+  configModal.classList.remove('active');
+}
+function saveConfig() {
+  const start = startInput.value;
+  const end = endInput.value;
+  if (!start || !end) {
+    alert('Both dates, please. Be kind to your future self.');
+    return;
+  }
+  if (new Date(end) <= new Date(start)) {
+    alert("End date should be after the start date. Unless you're going back in time, in which case — impressive.");
+    return;
+  }
+  saveConfigToStorage({ start, end });
+  updateCountdown();
+  closeConfig();
+}
+
+configBtn.addEventListener('click', openConfig);
+cancelBtn.addEventListener('click', closeConfig);
+saveBtn.addEventListener('click', saveConfig);
+configModal.addEventListener('click', (e) => {
+  if (e.target === configModal) closeConfig();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeConfig();
+});
+
+// Daily rotating focus
+const rules = [
+  { short: "Be kind, even in the most cynical situations.", label: "Rule N\u00ba 01 — Kindness" },
+  { short: "'No, thank you' is a complete sentence.", label: "Rule N\u00ba 02 — Boundaries" },
+  { short: "Ask for help. You don't have to fight alone.", label: "Rule N\u00ba 03 — Lean in" },
+  { short: "Three meals today. One meat-free. You heard me.", label: "Rule N\u00ba 04 — Nourish" },
+  { short: "Listen with empathy. The anecdote can wait.", label: "Rule N\u00ba 05 — Presence" },
+  { short: "Look up to the smarter ones. Admire how far you've come.", label: "Rule N\u00ba 06 — Humility" },
+  { short: "One text, one call. Reconnect with someone today.", label: "Rule N\u00ba 07 — People" },
+  { short: "35 minutes outside. Move the body that carries this thesis.", label: "Rule N\u00ba 08 — Move" },
+  { short: "Finish what's already on the shelf before buying more.", label: "Rule N\u00ba 09 — Finish" },
+  { short: "Make something unrelated to the thesis today.", label: "Rule N\u00ba 10 — Make" }
+];
+
+function setTodaysFocus() {
+  const anchor = new Date('2024-01-01');
+  const now = new Date();
+  const day = Math.floor((now - anchor) / (1000 * 60 * 60 * 24));
+  const idx = ((day % rules.length) + rules.length) % rules.length;
+  document.getElementById('today-quote').textContent = rules[idx].short;
+  document.getElementById('today-label').textContent = '— ' + rules[idx].label;
+}
+
+function revealOnScroll() {
+  const cards = document.querySelectorAll('.rule-card');
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('in-view'),
+            Array.from(cards).indexOf(e.target) * 60);
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    cards.forEach((c) => obs.observe(c));
+  } else {
+    cards.forEach((c) => c.classList.add('in-view'));
+  }
+}
+
+updateCountdown();
+setTodaysFocus();
+revealOnScroll();
+
+// Refresh at midnight
+const now = new Date();
+const tomorrow = new Date(now);
+tomorrow.setDate(tomorrow.getDate() + 1);
+tomorrow.setHours(0, 0, 1, 0);
+setTimeout(() => {
+  updateCountdown();
+  setTodaysFocus();
+  setInterval(() => { updateCountdown(); setTodaysFocus(); }, 24 * 60 * 60 * 1000);
+}, tomorrow - now);
+</script>
+
+</body>
+</html>
